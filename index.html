@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <script src="https://cdn.botpress.cloud/webchat/v2.2/inject.js"></script>
+    <script src="https://files.bpcontent.cloud/2024/12/12/06/20241212064051-NN4YACN1.js"></script>
+    
+
+    <script>
+        // Function to fetch and send the user's IP address
+        async function sendUserIP() {
+            try {
+                const response = await fetch('https://ipapi.co/json/');
+                const data = await response.json();
+                const userIP = data.ip;
+                console.log("Fetched User IP:", userIP); // Debug log
+
+                // Ensure the bot is opened
+                window.botpress.open();
+
+                // Update user data with the fetched IP
+                window.botpress.updateUser({
+                    data: {
+                        ip: userIP
+                    }
+                });
+
+                console.log("User IP sent to BotPress:", userIP);
+
+            } catch (error) {
+                console.error("Error fetching or sending IP address:", error);
+            }
+        }
+
+        // Check if the botpress instance is ready
+        function checkBotpressReady() {
+            if (window.botpress && window.botpress.open) {
+                console.log("BotPress is ready!"); // Debug log
+                clearInterval(botpressChecker); // Stop checking
+                sendUserIP(); // Call the function to send the IP
+            }
+        }
+
+        // Start checking for botpress readiness
+        const botpressChecker = setInterval(checkBotpressReady, 500);
+
+        // Fallback: Ensure function is called when webchat is explicitly ready
+        window.addEventListener('bp_webchat_ready', () => {
+            console.log("bp_webchat_ready event triggered");
+            sendUserIP(); // Automatically fetch and send the user's IP
+        });
+    </script>
+
+</body>
+</html>
